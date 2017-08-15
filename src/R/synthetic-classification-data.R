@@ -50,6 +50,9 @@ predVals <- predict( model, newDf, type="response")
 predictions <- data.frame(z1,z2,class,predVals)
 # =============================================================================
 # write to file
-#write(inputs, file = "../data/inputs.txt", ncolumns = 1)
-#write(targets, file = "../data/targets.txt", ncolumns = 1)
+write(x1, file = "../data/train/x1.txt", ncolumns = 1)
+write(x2, file = "../data/train/x2.txt", ncolumns = 1)
+write(class, file = "../data/train/class.txt", ncolumns = 1)
 
+write(x1, file = "../data/test/z1.txt", ncolumns = 1)
+write(x2, file = "../data/test/z2.txt", ncolumns = 1)
