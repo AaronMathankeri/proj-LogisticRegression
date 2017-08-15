@@ -34,7 +34,20 @@ ggplot(df, aes(x = x1, y = x2)) +
   geom_point(aes(color=class, shape=class))
 # =============================================================================
 # logistic regression in R
-#model <- glm()
+model <- glm( class ~ ., family = binomial(link='logit'), data=df)
+summary( model )
+# =============================================================================
+# test
+zOne <- runif( nSamples, -1, -1) + rnorm( nSamples, 0, 0.1 )
+zTwo <- runif( nSamples, 0, 0) + rnorm( nSamples, 0, 0.1 )
+z1 <- c( xOne, xTwo )
+wOne <- runif( nSamples, -1, -1) + rnorm( nSamples, 0, 0.1 )
+wTwo <- runif( nSamples, 0, 0) + rnorm( nSamples, 0, 0.1 )
+z2 <- c( wOne, wTwo )
+
+newDf <- cbind.data.frame( z1, z2)
+predVals <- predict( model, newDf, type="response")
+predictions <- data.frame(z1,z2,class,predVals)
 # =============================================================================
 # write to file
 #write(inputs, file = "../data/inputs.txt", ncolumns = 1)
