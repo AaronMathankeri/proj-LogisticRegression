@@ -1,0 +1,25 @@
+//Copyright (C) 2017 Aaron Mathankeri (aaron@quantifiedag.com)
+//License: QuantifiedAG Software License.  See LICENSE.txt for full license.
+
+Git Workflow: 		Feature Branch
+Git Handle:		origin
+
+
+Version:
+---------------------
+Git Commit
+
+* Frequency
+2-3 times per day, no more
+
+* Commit Template
+$ git commit (-a)
+
+One brief sentence on what you did at a high level. 15 words max.
+"Created scaling function for temp readings"
+
+A mini-paragraph explaining in detail what you did. For example,
+"I scaled the temperature readings per hour. To do this, I created
+a function named 'scaleFeatures'. I used the library function from
+dplyr to achieve this. Scaling is now done before analysis."
+---------------------
