@@ -18,4 +18,12 @@ CONTENTS OF THIS FILE
  * Maintainers
  ---------------------
  INTRODUCTION
+Logistic regression is used for binary classification.
+For simplicity, the basis functions will be taken to
+be polynomial, with order = 2.
+This will essentially be a line of best fit that will
+be transformed by a sigmoid function.
+y(x,w) = w0 + w1*x
+
+p(c = 1 | x) = sigma(y).
  ---------------------

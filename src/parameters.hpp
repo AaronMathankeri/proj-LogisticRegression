@@ -9,6 +9,6 @@
 #define PARAMETERS_H
 
 const int NUM_PATTERNS = 20;
-const int ORDER = 4;
+const int ORDER = 2;
 
 #endif /* PARAMETERS_H */

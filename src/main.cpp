@@ -2,11 +2,11 @@
 //License: QuantifiedAG Software License.  See LICENSE.txt for full license.
 
 /*
- *   \file example.cpp
- *   \brief A Documented file.
+ *   main.cpp
+ *   \brief HPC implementation of logistic regression
  *
- *  Detailed description
- *
+ *  p(c=1|x) = sigma( x*w )
+ * 
  */
 #include <iostream>
 #include "mkl.h"
@@ -15,8 +15,6 @@
 #include "linearParameterModels.hpp"
 
 using namespace std;
-
-
 
 int main(int argc, char *argv[])
 {
