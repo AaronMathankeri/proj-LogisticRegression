@@ -15,6 +15,7 @@
 
 using namespace std;
 void printVector( const double *x , const int length );
+void printFeatures( const double *x1, const double *x2, const int length );
 void printMatrix( const double *x, const int nRows, const int nCols);
 void loadData( double *x , const string fileName );
 
