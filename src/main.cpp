@@ -16,17 +16,25 @@
 
 using namespace std;
 
+
+
 int main(int argc, char *argv[])
 {
       cout << " Aaron's Back." << endl;
 
       //--------------------------------------------------------------------------------
       // declare variables for calculations
-      double *x1, *x2, *t;
+      double *x1, *x2, *t; //data
+      double *weights, *designMatrix, *R, *z; //logistic regression parameters
 
       x1 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       x2 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       t = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
+
+      weights = (double *)mkl_malloc( ORDER*sizeof( double ), 64 );
+      designMatrix = (double *)mkl_malloc( NUM_PATTERNS*ORDER*sizeof( double ), 64 );
+      R = (double *)mkl_malloc( NUM_PATTERNS*NUM_PATTERNS*sizeof( double ), 64 );
+      z = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       
       memset( x1, 0.0,  NUM_PATTERNS * sizeof(double));
       memset( x2, 0.0,  NUM_PATTERNS * sizeof(double));
@@ -48,10 +56,19 @@ int main(int argc, char *argv[])
       cout << "Targets" << endl;
       printVector( t, NUM_PATTERNS );
       //--------------------------------------------------------------------------------
+      //--------------------------------------------------------------------------------
+      //--------------------------------------------------------------------------------
+      //--------------------------------------------------------------------------------
+      //--------------------------------------------------------------------------------
+      //--------------------------------------------------------------------------------
       printf ("\n Deallocating memory \n\n");
       mkl_free( x1 );
       mkl_free( x2 );
       mkl_free( t );
+      mkl_free( weights );
+      mkl_free( designMatrix );
+      mkl_free( R );
+      mkl_free( z );
       printf (" Example completed. \n\n");
 
       return 0;
