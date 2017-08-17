@@ -47,12 +47,12 @@ int main(int argc, char *argv[])
       loadData( x2 , x2File );
       loadData( t , targetsFile );
       
-      cout << "Features" << endl;
+      cout << "First 10 Features" << endl;
       cout << "x1\t | \tx2" << endl;
-      printFeatures( x1, x2, NUM_PATTERNS );
+      printFeatures( x1, x2, 10 );
       
-      cout << "Targets" << endl;
-      printVector( t, NUM_PATTERNS );
+      cout << "First 10 Targets" << endl;
+      printVector( t, 10 );
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
