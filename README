@@ -26,4 +26,7 @@ be transformed by a sigmoid function.
 y(x,w) = w0 + w1*x
 
 p(c = 1 | x) = sigma(y).
+
+Classification is only possible if data is NOT linearly
+separable.
  ---------------------
