@@ -16,6 +16,26 @@
 
 using namespace std;
 
+void computeGradient( double *x, double *t, double *designMatrix ){
+      //gradE = phi' * ( y - t )
+      ;
+}
+
+void computeHessian( double *x, double * designMatrix ){
+      //H = phi' * R * phi
+      ;
+}
+
+void computeOutputs( double *x, double *w ){
+      // y = sigma( w'* x )
+      ;
+}
+
+void logisticSigmoid( double *a){
+      // sigma(a) = (1 + exp(-a) )^-1
+      ;
+}
+
 int main(int argc, char *argv[])
 {
       cout << " Aaron's Back." << endl;
@@ -51,7 +71,7 @@ int main(int argc, char *argv[])
       cout << "x1\t | \tx2" << endl;
       printFeatures( x1, x2, 10 );
       
-      cout << "First 10 Targets" << endl;
+      cout << "\nFirst 10 Targets" << endl;
       printVector( t, 10 );
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------

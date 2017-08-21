@@ -1,0 +1,6 @@
+==========
+Mon Aug 21 11:11:25 CDT 2017
+- Trainig in Logistic Regression is done using Newton's method because
+  the hessian is typically cheap to calculate.
+  For now, I will implement a version of Newton's method and replace it with
+  TR algorithms because of their superconvergence properties.
