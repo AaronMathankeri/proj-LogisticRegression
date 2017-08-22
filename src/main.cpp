@@ -84,9 +84,14 @@ int main(int argc, char *argv[])
       // put all data into X matrix!
       double *X = (double *)mkl_malloc( NUM_PATTERNS*(ORDER - 1)*sizeof( double ), 64 );
       memset( X, 0.0,  NUM_PATTERNS *(ORDER - 1)* sizeof(double));
+      
+      for (int i = 0; i < NUM_PATTERNS; ++i) {
+	    X[i*(ORDER - 1) + 0] = x1[i];
+	    X[i*(ORDER - 1) + 1] = x2[i];
+      }
 
-
-
+      cout << "Data matrix, 10 Features" << endl;
+      printMatrix( X , 10, 2);
 
 
 
