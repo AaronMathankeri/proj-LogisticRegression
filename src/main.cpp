@@ -29,9 +29,24 @@ void computeGradient( double *y, double *t, double *designMatrix, double *gradE 
 		  ORDER, y, incx, beta, gradE, incx);
 }
 
-void computeHessian( double *designMatrix, double *R ){
+void computeHessian( double *designMatrix, double *R, double *Hessian ){
       //H = phi' * R * phi
-      ;
+      double alpha, beta;
+      alpha = 1.0;
+      beta = 0.0;
+      double *A = (double *)mkl_malloc( ORDER*NUM_PATTERNS*sizeof( double ), 64 );
+      memset( A, 0.0,  ORDER * NUM_PATTERNS* sizeof(double));
+
+      //calculate product = Phi' * R = A
+      cblas_dgemm(CblasRowMajor, CblasTrans, CblasNoTrans, 
+		  ORDER, NUM_PATTERNS, NUM_PATTERNS, alpha, designMatrix,
+		  NUM_PATTERNS, R, NUM_PATTERNS, beta, A, NUM_PATTERNS);
+      // A * phi = Hessian
+      cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 
+		  ORDER, ORDER, NUM_PATTERNS, alpha, A,
+		  NUM_PATTERNS, designMatrix, ORDER, beta, Hessian, ORDER);
+
+      mkl_free( A );
 }
 
 void logisticSigmoid( double &a ){
@@ -139,19 +154,17 @@ int main(int argc, char *argv[])
       for (int i = 0; i < NUM_PATTERNS; ++i) {
 	    R[i*NUM_PATTERNS + i] = y[i] * (1.0 - y[i]);
       }
-      /*
-      cout <<"Top right corner of R matrix" << endl;
-      for (int i=0; i < 10; i++) {
-	    for (int j=0; j < 10; j++) {
-		  printf ("%12.5f", R[i*NUM_PATTERNS +j]);
-	    }
-	    printf ("\n");
-	    }*/
       //--------------------------------------------------------------------------------
       computeGradient( y , t, designMatrix, gradE );
       cout << "\nGradient :" <<endl;
       printVector( gradE, ORDER );
-
+      //--------------------------------------------------------------------------------
+      computeHessian( designMatrix, R, Hessian );
+      cout << "\nHessian :" <<endl;
+      printMatrix( Hessian, ORDER, ORDER );
+      //--------------------------------------------------------------------------------
+      //--------------------------------------------------------------------------------
+      //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
       printf ("\n Deallocating memory \n\n");
@@ -164,6 +177,8 @@ int main(int argc, char *argv[])
       mkl_free( R );
       mkl_free( z );
       mkl_free( X );
+      mkl_free( gradE );
+      mkl_free( Hessian );
       printf (" Example completed. \n\n");
 
       return 0;
