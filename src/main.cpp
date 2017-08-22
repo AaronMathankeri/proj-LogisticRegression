@@ -16,21 +16,24 @@
 
 using namespace std;
 
-void computeGradient( double *x, double *t, double *designMatrix ){
+void computeGradient( double *y, double *t, double *designMatrix, double *gradE ){
       //gradE = phi' * ( y - t )
-      ;
+      //1. y <- y -t
+      vdSub( NUM_PATTERNS, y, t, y);
+      //2. phi' * y
+      double alpha, beta;
+      alpha = 1.0;
+      beta = 0.0;
+      const int incx = 1;
+      cblas_dgemv(CblasRowMajor, CblasTrans, NUM_PATTERNS, ORDER, alpha, designMatrix,
+		  ORDER, y, incx, beta, gradE, incx);
 }
 
-void computeHessian( double *x, double * designMatrix ){
+void computeHessian( double *designMatrix, double *R ){
       //H = phi' * R * phi
       ;
 }
-/*
-void computeOutputs( double *x, double *w, double *y ){
-      // y = sigma( w'* x )
-      ;
-}
-*/
+
 void logisticSigmoid( double &a ){
       // sigma(a) = (1 + exp(-a) )^-1
       a = 1.0/( 1 + exp(-a) );
@@ -66,6 +69,8 @@ int main(int argc, char *argv[])
       double *x1, *x2, *t, *X; //data
       double *weights, *y, *designMatrix, *R, *z; //logistic regression parameters
 
+      double *gradE, *Hessian;
+      
       x1 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       x2 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       t = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
@@ -77,7 +82,9 @@ int main(int argc, char *argv[])
       R = (double *)mkl_malloc( NUM_PATTERNS*NUM_PATTERNS*sizeof( double ), 64 );
       z = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       
-
+      gradE = (double *)mkl_malloc( ORDER*sizeof( double ), 64 );
+      Hessian = (double *)mkl_malloc( ORDER*ORDER*sizeof( double ), 64 );
+      
       memset( x1, 0.0,  NUM_PATTERNS * sizeof(double));
       memset( x2, 0.0,  NUM_PATTERNS * sizeof(double));
       memset( t, 0.0,  NUM_PATTERNS * sizeof(double));
@@ -88,6 +95,10 @@ int main(int argc, char *argv[])
       memset( designMatrix, 0.0,  NUM_PATTERNS * ORDER* sizeof(double));
       memset( R, 0.0,  NUM_PATTERNS *NUM_PATTERNS* sizeof(double));
       memset( z, 0.0,  NUM_PATTERNS * sizeof(double));
+
+      memset( gradE, 0.0, ORDER * sizeof(double));
+      memset( Hessian, 0.0,  ORDER * ORDER* sizeof(double));
+
       //--------------------------------------------------------------------------------
       //read data
       string x1File = "./data/train/x1.txt";
@@ -128,15 +139,18 @@ int main(int argc, char *argv[])
       for (int i = 0; i < NUM_PATTERNS; ++i) {
 	    R[i*NUM_PATTERNS + i] = y[i] * (1.0 - y[i]);
       }
-
+      /*
       cout <<"Top right corner of R matrix" << endl;
       for (int i=0; i < 10; i++) {
 	    for (int j=0; j < 10; j++) {
 		  printf ("%12.5f", R[i*NUM_PATTERNS +j]);
 	    }
 	    printf ("\n");
-      }
+	    }*/
       //--------------------------------------------------------------------------------
+      computeGradient( y , t, designMatrix, gradE );
+      cout << "\nGradient :" <<endl;
+      printVector( gradE, ORDER );
 
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
