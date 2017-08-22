@@ -4,3 +4,7 @@ Mon Aug 21 11:11:25 CDT 2017
   the hessian is typically cheap to calculate.
   For now, I will implement a version of Newton's method and replace it with
   TR algorithms because of their superconvergence properties.
+
+
+  For logistic regression, the Hessian and gradient are relatively easy and
+  cheap to compute. That's why its used!

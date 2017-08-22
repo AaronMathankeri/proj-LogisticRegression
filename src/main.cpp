@@ -26,14 +26,14 @@ void computeHessian( double *x, double * designMatrix ){
       ;
 }
 
-void computeOutputs( double *x, double *w ){
+void computeOutputs( double *x, double *w, double *y ){
       // y = sigma( w'* x )
       ;
 }
 
-void logisticSigmoid( double *a){
+void logisticSigmoid( double &a ){
       // sigma(a) = (1 + exp(-a) )^-1
-      ;
+      a = 1.0/( 1 + exp(-a) );
 }
 
 int main(int argc, char *argv[])
@@ -74,6 +74,9 @@ int main(int argc, char *argv[])
       cout << "\nFirst 10 Targets" << endl;
       printVector( t, 10 );
       //--------------------------------------------------------------------------------
+      double a = 0.83;
+      logisticSigmoid( a );
+      cout << " sigmoid of 0.8 = " << a << endl;
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
