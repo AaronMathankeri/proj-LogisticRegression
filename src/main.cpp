@@ -36,28 +36,58 @@ void logisticSigmoid( double &a ){
       a = 1.0/( 1 + exp(-a) );
 }
 
+void computeDataMatrix( const double *x1, const double *x2, double *X ){
+      for (int i = 0; i < NUM_PATTERNS; ++i) {
+	    X[i*(ORDER - 1) + 0] = x1[i];
+	    X[i*(ORDER - 1) + 1] = x2[i];
+      }
+}
+void computeMyOutputs( const double *weights, const double *designMatrix, double *y ){
+      // y = sigma( Phi'*w)
+      double alpha, beta;
+      alpha = 1.0;
+      beta = 0.0;
+      const int incx = 1;
+
+      cblas_dgemv(CblasRowMajor, CblasNoTrans, NUM_PATTERNS, ORDER, alpha, designMatrix,
+		  ORDER, weights, incx, beta, y, incx);
+
+      //now apply to sigmoid to each element
+      for (int i = 0; i < NUM_PATTERNS; ++i) {
+	    logisticSigmoid( y[i] );
+      }
+}
 int main(int argc, char *argv[])
 {
       cout << " Aaron's Back." << endl;
 
       //--------------------------------------------------------------------------------
       // declare variables for calculations
-      double *x1, *x2, *t; //data
+      double *x1, *x2, *t, *X; //data
       double *weights, *y, *designMatrix, *R, *z; //logistic regression parameters
 
       x1 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       x2 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       t = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
-
+      X = (double *)mkl_malloc( NUM_PATTERNS*(ORDER - 1)*sizeof( double ), 64 );
+      
       weights = (double *)mkl_malloc( ORDER*sizeof( double ), 64 );
       y = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       designMatrix = (double *)mkl_malloc( NUM_PATTERNS*ORDER*sizeof( double ), 64 );
       R = (double *)mkl_malloc( NUM_PATTERNS*NUM_PATTERNS*sizeof( double ), 64 );
       z = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       
+
       memset( x1, 0.0,  NUM_PATTERNS * sizeof(double));
       memset( x2, 0.0,  NUM_PATTERNS * sizeof(double));
       memset( t, 0.0,  NUM_PATTERNS * sizeof(double));
+      memset( X, 0.0,  NUM_PATTERNS *(ORDER - 1)* sizeof(double));
+
+      memset( weights, 0.0,  ORDER * sizeof(double));
+      memset( y, 0.0,  NUM_PATTERNS * sizeof(double));
+      memset( designMatrix, 0.0,  NUM_PATTERNS * ORDER* sizeof(double));
+      memset( R, 0.0,  NUM_PATTERNS *NUM_PATTERNS* sizeof(double));
+      memset( z, 0.0,  NUM_PATTERNS * sizeof(double));
       //--------------------------------------------------------------------------------
       //read data
       string x1File = "./data/train/x1.txt";
@@ -82,13 +112,7 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------------------
       //2. Compute outputs
       // put all data into X matrix!
-      double *X = (double *)mkl_malloc( NUM_PATTERNS*(ORDER - 1)*sizeof( double ), 64 );
-      memset( X, 0.0,  NUM_PATTERNS *(ORDER - 1)* sizeof(double));
-      
-      for (int i = 0; i < NUM_PATTERNS; ++i) {
-	    X[i*(ORDER - 1) + 0] = x1[i];
-	    X[i*(ORDER - 1) + 1] = x2[i];
-      }
+      computeDataMatrix( x1, x2, X );
       //--------------------------------------------------------------------------------
       // design matrix is just X with a column of ones at the first position
       computeDesignMatrix( X, designMatrix );
@@ -96,17 +120,7 @@ int main(int argc, char *argv[])
       printMatrix( designMatrix, 10, 3);
       //--------------------------------------------------------------------------------
       // y = sigma( Phi'*w)
-      double alpha, beta;
-      alpha = 1.0;
-      beta = 0.0;
-      const int incx = 1;
-      cblas_dgemv(CblasRowMajor, CblasNoTrans, NUM_PATTERNS, ORDER, alpha, designMatrix,
-		  ORDER, weights, incx, beta, y, incx);
-
-      //now apply to sigmoid to each element
-      for (int i = 0; i < NUM_PATTERNS; ++i) {
-	    logisticSigmoid( y[i] );
-      }
+      computeMyOutputs( weights, designMatrix, y );
       cout << "\n First 10 Outputs" <<endl;
       printVector( y, 10 );
       //--------------------------------------------------------------------------------
