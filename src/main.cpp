@@ -12,7 +12,7 @@
 #include "mkl.h"
 #include "ioFunctions.hpp"
 #include "parameters.hpp"
-#include "linearParameterModels.hpp"
+#include "logisticRegression.hpp"
 
 using namespace std;
 
@@ -25,12 +25,12 @@ void computeHessian( double *x, double * designMatrix ){
       //H = phi' * R * phi
       ;
 }
-
+/*
 void computeOutputs( double *x, double *w, double *y ){
       // y = sigma( w'* x )
       ;
 }
-
+*/
 void logisticSigmoid( double &a ){
       // sigma(a) = (1 + exp(-a) )^-1
       a = 1.0/( 1 + exp(-a) );
@@ -43,13 +43,14 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------------------
       // declare variables for calculations
       double *x1, *x2, *t; //data
-      double *weights, *designMatrix, *R, *z; //logistic regression parameters
+      double *weights, *y, *designMatrix, *R, *z; //logistic regression parameters
 
       x1 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       x2 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       t = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
 
       weights = (double *)mkl_malloc( ORDER*sizeof( double ), 64 );
+      y = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       designMatrix = (double *)mkl_malloc( NUM_PATTERNS*ORDER*sizeof( double ), 64 );
       R = (double *)mkl_malloc( NUM_PATTERNS*NUM_PATTERNS*sizeof( double ), 64 );
       z = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
@@ -74,10 +75,23 @@ int main(int argc, char *argv[])
       cout << "\nFirst 10 Targets" << endl;
       printVector( t, 10 );
       //--------------------------------------------------------------------------------
-      double a = 0.83;
-      logisticSigmoid( a );
-      cout << " sigmoid of 0.8 = " << a << endl;
+      //1. Randomly initialize weights.( srandnull() ) for true randomization
+      setRandomWeights( weights );
+      cout << "\nInitial Weights" << endl;
+      printVector( weights, ORDER );
       //--------------------------------------------------------------------------------
+      //2. Compute outputs
+      // put all data into X matrix!
+      double *X = (double *)mkl_malloc( NUM_PATTERNS*(ORDER - 1)*sizeof( double ), 64 );
+      memset( X, 0.0,  NUM_PATTERNS *(ORDER - 1)* sizeof(double));
+
+
+
+
+
+
+      //cout << "\n First 10 Outputs" <<endl;
+      //      computeOutputs( x, weights, y);
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
@@ -87,9 +101,11 @@ int main(int argc, char *argv[])
       mkl_free( x2 );
       mkl_free( t );
       mkl_free( weights );
+      mkl_free( y );
       mkl_free( designMatrix );
       mkl_free( R );
       mkl_free( z );
+      mkl_free( X );
       printf (" Example completed. \n\n");
 
       return 0;

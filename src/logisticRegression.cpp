@@ -1,4 +1,4 @@
-#include "linearParameterModels.hpp"
+#include "logisticRegression.hpp"
 
 void computeIdentityBasisFuncs( const double *x, double *psi ){
       // psi(x) = x --> identity basis for linear regression
@@ -9,17 +9,7 @@ void computeIdentityBasisFuncs( const double *x, double *psi ){
       }
 }
 
-void computePolynomialBasisFuncs( const double *x , double *psi ){
-      // psi(x) = (x x^2 x^3) --> polynomial basis
-      for (int i = 0; i < NUM_PATTERNS; ++i) {
-	    for (int j = 0; j < (ORDER - 1); ++j) {
-		  int p = j + 1;
-		  psi[i*(ORDER - 1) + j] = pow(x[i], p);
-	    }
-      }
-}
-
-void computeDesignMatrix( const double *x, double *Phi, const int form ){
+void computeDesignMatrix( const double *x, double *Phi ){
       double *psi, *ones;
       const int incx = 1;
       
@@ -29,12 +19,6 @@ void computeDesignMatrix( const double *x, double *Phi, const int form ){
       memset( psi, 0.0, NUM_PATTERNS* (ORDER - 1)*sizeof(double));
       fill_n(ones, NUM_PATTERNS, 1.0); // create ones vector
 
-      if (form == 0) {
-	    computeIdentityBasisFuncs( x, psi );	    
-      }
-      else {
-	    computePolynomialBasisFuncs( x, psi );
-      }
       //set first column to 1--dummy index to calculate w0
       cblas_dcopy(NUM_PATTERNS, ones, incx, Phi, ORDER);
       // set columns 1 ... M-1 with basis function vectors
