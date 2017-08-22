@@ -19,6 +19,8 @@ void computeDesignMatrix( const double *x, double *Phi ){
       memset( psi, 0.0, NUM_PATTERNS* (ORDER - 1)*sizeof(double));
       fill_n(ones, NUM_PATTERNS, 1.0); // create ones vector
 
+      computeIdentityBasisFuncs( x, psi );
+      
       //set first column to 1--dummy index to calculate w0
       cblas_dcopy(NUM_PATTERNS, ones, incx, Phi, ORDER);
       // set columns 1 ... M-1 with basis function vectors
@@ -93,7 +95,7 @@ double computeLeastSquaresError( const double *t, const double *y ){
 }
 void setRandomWeights( double *weights ){
       for (int i = 0; i < ORDER; ++i) {
-	    double temp = fRand( -10.0, 10.0);
+	    double temp = fRand( -1.0, 10.0);
 	    weights[i] = temp;
       }
 }

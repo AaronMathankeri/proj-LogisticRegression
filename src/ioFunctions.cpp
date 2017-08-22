@@ -2,7 +2,7 @@
 
 void printVector( const double *x , const int length ){
       for (int i = 0; i < length; i++) {
-	    printf ("%12.3f", x[i]);
+	    printf ("%12.5f", x[i]);
 	    printf ("\n");
       }
 }

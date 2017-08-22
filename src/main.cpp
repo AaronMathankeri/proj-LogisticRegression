@@ -89,16 +89,41 @@ int main(int argc, char *argv[])
 	    X[i*(ORDER - 1) + 0] = x1[i];
 	    X[i*(ORDER - 1) + 1] = x2[i];
       }
-
-      cout << "Data matrix, 10 Features" << endl;
-      printMatrix( X , 10, 2);
-
-
-
-      //cout << "\n First 10 Outputs" <<endl;
-      //      computeOutputs( x, weights, y);
       //--------------------------------------------------------------------------------
+      // design matrix is just X with a column of ones at the first position
+      computeDesignMatrix( X, designMatrix );
+      cout << "\nDesign matrix" << endl;
+      printMatrix( designMatrix, 10, 3);
       //--------------------------------------------------------------------------------
+      // y = sigma( Phi'*w)
+      double alpha, beta;
+      alpha = 1.0;
+      beta = 0.0;
+      const int incx = 1;
+      cblas_dgemv(CblasRowMajor, CblasNoTrans, NUM_PATTERNS, ORDER, alpha, designMatrix,
+		  ORDER, weights, incx, beta, y, incx);
+
+      //now apply to sigmoid to each element
+      for (int i = 0; i < NUM_PATTERNS; ++i) {
+	    logisticSigmoid( y[i] );
+      }
+      cout << "\n First 10 Outputs" <<endl;
+      printVector( y, 10 );
+      //--------------------------------------------------------------------------------
+      // Compute R - matrix
+      for (int i = 0; i < NUM_PATTERNS; ++i) {
+	    R[i*NUM_PATTERNS + i] = y[i] * (1.0 - y[i]);
+      }
+
+      cout <<"Top right corner of R matrix" << endl;
+      for (int i=0; i < 10; i++) {
+	    for (int j=0; j < 10; j++) {
+		  printf ("%12.5f", R[i*NUM_PATTERNS +j]);
+	    }
+	    printf ("\n");
+      }
+      //--------------------------------------------------------------------------------
+
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
       printf ("\n Deallocating memory \n\n");
