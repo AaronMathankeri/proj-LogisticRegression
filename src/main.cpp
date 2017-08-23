@@ -92,6 +92,19 @@ void computeMyOutputs( const double *weights, const double *designMatrix, double
       }
 }
 
+void computeUpdates( const double *gradE, const double *invHessian, double *deltaWeights ){
+      //2. deltaWeights = invHessian * gradE
+      double alpha, beta;
+      alpha = 1.0;
+      beta = 0.0;
+      const int incx = 1;
+      cblas_dgemv(CblasRowMajor, CblasNoTrans, ORDER, ORDER, alpha, invHessian,
+		  ORDER, gradE, incx, beta, deltaWeights, incx);
+}
+
+void updateWeights( double *weights, double *deltaWeights ){
+      vdAdd( ORDER, weights, deltaWeights, weights);
+}
 
 int main(int argc, char *argv[])
 {
@@ -186,6 +199,23 @@ int main(int argc, char *argv[])
       cout << "\nInverse Hessian :" <<endl;
       printMatrix( Hessian, ORDER, ORDER );
       //--------------------------------------------------------------------------------
+      computeUpdates( gradE, Hessian, deltaWeights );
+      cout << "\nChange in weights is :" << endl;
+      printVector( deltaWeights, ORDER );
+      //--------------------------------------------------------------------------------
+      cout << "\n\nInitial error is " << computeLeastSquaresError( t, y ) << endl;
+      
+      updateWeights( weights, deltaWeights );
+      //cout << "\nNew Weights" << endl;
+      //printVector( weights, ORDER );
+
+      computeMyOutputs( weights, designMatrix, y );
+      cout << "\nFirst 10 Outputs" <<endl;
+      //printVector( y, 100 );
+
+      cout << "\n\nNew error is " << computeLeastSquaresError( t, y ) << endl;
+
+
       // Newton's method!
       //1. compute gradient
       //2. compute Hessian
