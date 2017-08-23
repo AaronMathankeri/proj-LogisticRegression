@@ -216,13 +216,59 @@ int main(int argc, char *argv[])
       //printVector( y, 100 );
 
       cout << "\n\nNew error is " << computeLeastSquaresError( t, y ) << endl;
-      //--------------------------------------------------------------------------------
       // Newton's method!
       //1. compute gradient
       //2. compute Hessian
       //3. compute Inverse Hessian
       //4. compute update
       //5. apply update
+      //--------------------------------------------------------------------------------
+      //*
+      double error, newError, diff, thresh;
+      error = computeLeastSquaresError( t , y) ;
+      newError = error + 1e1;
+      thresh = 1e-5;
+      diff = 1.0;
+      
+      //while ( thresh < diff ) {
+      cout << "\nCurrent Weights" << endl;
+      printVector( weights, ORDER );
+
+      computeMyOutputs( weights, designMatrix, y );
+      cout << "\nFirst 10 Outputs" <<endl;
+      printVector( y, 100 );
+
+      // Compute R - matrix
+      for (int i = 0; i < NUM_PATTERNS; ++i) {
+	    R[i*NUM_PATTERNS + i] = y[i] * (1.0 - y[i]);
+      }
+
+      computeGradient( y , t, designMatrix, gradE );
+      cout << "\nGradient :" <<endl;
+      printVector( gradE, ORDER );
+
+      computeHessian( designMatrix, R, Hessian );
+      cout << "\nHessian :" <<endl;
+      printMatrix( Hessian, ORDER, ORDER );
+
+      computeInverseHessian( Hessian );
+
+      computeUpdates( gradE, Hessian, deltaWeights );
+
+      updateWeights( weights, deltaWeights );
+
+      cout << "\nNew Weights" << endl;
+      printVector( weights, ORDER );
+
+      computeMyOutputs( weights, designMatrix, y );
+	    
+      newError = computeLeastSquaresError( t , y);
+	    
+      cout << "New error is " << newError << endl;
+
+      diff = diff - 0.05;
+      //}
+      //*/
       //--------------------------------------------------------------------------------
       cout << "\nOptimal Weights" << endl;
       printVector( weights, ORDER );
