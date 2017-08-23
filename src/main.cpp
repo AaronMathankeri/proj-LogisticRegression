@@ -49,6 +49,21 @@ void computeHessian( double *designMatrix, double *R, double *Hessian ){
       mkl_free( A );
 }
 
+void computeInverseHessian( double *Hessian ){
+      //declare MKL variables for inverse calculation
+      int LWORK = ORDER*ORDER;
+      int INFO;
+      int *IPIV = (int *)mkl_malloc( (ORDER+1)*sizeof( int ), 64 );
+      double *WORK = (double *)mkl_malloc( LWORK*sizeof( double ), 64 );
+
+      //calculate inverse A = (A)^-1
+      dgetrf( &ORDER, &ORDER, Hessian, &ORDER, IPIV, &INFO );
+      dgetri( &ORDER, Hessian, &ORDER, IPIV, WORK, &LWORK, &INFO );
+
+      mkl_free( IPIV );
+      mkl_free( WORK );
+}
+
 void logisticSigmoid( double &a ){
       // sigma(a) = (1 + exp(-a) )^-1
       a = 1.0/( 1 + exp(-a) );
@@ -60,6 +75,7 @@ void computeDataMatrix( const double *x1, const double *x2, double *X ){
 	    X[i*(ORDER - 1) + 1] = x2[i];
       }
 }
+
 void computeMyOutputs( const double *weights, const double *designMatrix, double *y ){
       // y = sigma( Phi'*w)
       double alpha, beta;
@@ -75,6 +91,8 @@ void computeMyOutputs( const double *weights, const double *designMatrix, double
 	    logisticSigmoid( y[i] );
       }
 }
+
+
 int main(int argc, char *argv[])
 {
       cout << " Aaron's Back." << endl;
@@ -84,7 +102,7 @@ int main(int argc, char *argv[])
       double *x1, *x2, *t, *X; //data
       double *weights, *y, *designMatrix, *R, *z; //logistic regression parameters
 
-      double *gradE, *Hessian;
+      double *gradE, *Hessian, *deltaWeights;
       
       x1 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       x2 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
@@ -99,6 +117,7 @@ int main(int argc, char *argv[])
       
       gradE = (double *)mkl_malloc( ORDER*sizeof( double ), 64 );
       Hessian = (double *)mkl_malloc( ORDER*ORDER*sizeof( double ), 64 );
+      deltaWeights = (double *)mkl_malloc( ORDER*sizeof( double ), 64 );
       
       memset( x1, 0.0,  NUM_PATTERNS * sizeof(double));
       memset( x2, 0.0,  NUM_PATTERNS * sizeof(double));
@@ -113,7 +132,7 @@ int main(int argc, char *argv[])
 
       memset( gradE, 0.0, ORDER * sizeof(double));
       memset( Hessian, 0.0,  ORDER * ORDER* sizeof(double));
-
+      memset( deltaWeights, 0.0, ORDER * sizeof(double));
       //--------------------------------------------------------------------------------
       //read data
       string x1File = "./data/train/x1.txt";
@@ -126,10 +145,10 @@ int main(int argc, char *argv[])
       
       cout << "First 10 Features" << endl;
       cout << "x1\t | \tx2" << endl;
-      printFeatures( x1, x2, 10 );
+      printFeatures( x1, x2, 5 );
       
-      cout << "\nFirst 10 Targets" << endl;
-      printVector( t, 10 );
+      //cout << "\nFirst 10 Targets" << endl;
+      //printVector( t, 10 );
       //--------------------------------------------------------------------------------
       //1. Randomly initialize weights.( srandnull() ) for true randomization
       setRandomWeights( weights );
@@ -147,8 +166,8 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------------------
       // y = sigma( Phi'*w)
       computeMyOutputs( weights, designMatrix, y );
-      cout << "\n First 10 Outputs" <<endl;
-      printVector( y, 10 );
+      cout << "\nFirst 10 Outputs" <<endl;
+      printVector( y, 5 );
       //--------------------------------------------------------------------------------
       // Compute R - matrix
       for (int i = 0; i < NUM_PATTERNS; ++i) {
@@ -163,7 +182,17 @@ int main(int argc, char *argv[])
       cout << "\nHessian :" <<endl;
       printMatrix( Hessian, ORDER, ORDER );
       //--------------------------------------------------------------------------------
+      computeInverseHessian( Hessian );
+      cout << "\nInverse Hessian :" <<endl;
+      printMatrix( Hessian, ORDER, ORDER );
       //--------------------------------------------------------------------------------
+      // Newton's method!
+      //1. compute gradient
+      //2. compute Hessian
+      //3. compute Inverse Hessian
+      //4. compute update
+      //5. apply update
+
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
       //--------------------------------------------------------------------------------
