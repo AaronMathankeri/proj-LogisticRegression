@@ -8,3 +8,10 @@ Mon Aug 21 11:11:25 CDT 2017
 
   For logistic regression, the Hessian and gradient are relatively easy and
   cheap to compute. That's why its used!
+
+==========
+Wed Aug 23 23:05:10 CDT 2017
+there is an error with the logistic sigmoid. the values are clamping to
+1 and 0 too quickly. When calculating the "R" matrix:
+y*(1-y) the values are just zero then. Need to fix this issue for
+Newton's optimization method. 

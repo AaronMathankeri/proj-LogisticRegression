@@ -67,7 +67,7 @@ void computeInverseHessian( double *Hessian ){
 
 void logisticSigmoid( double &a ){
       // sigma(a) = (1 + exp(-a) )^-1
-      a = 1.0/( 1 + exp(-a) );
+      a = 1.0/( 1.0 + exp(-a) );
 }
 
 void computeDataMatrix( const double *x1, const double *x2, double *X ){
@@ -177,7 +177,6 @@ int main(int argc, char *argv[])
       computeDesignMatrix( X, designMatrix );
       cout << "\nDesign matrix" << endl;
       printMatrix( designMatrix, 10, 3);
-
       //--------------------------------------------------------------------------------
       // y = sigma( Phi'*w)
       computeMyOutputs( weights, designMatrix, y );
