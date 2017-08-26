@@ -172,6 +172,8 @@ int main(int argc, char *argv[])
       //2. Compute outputs
       // put all data into X matrix!
       computeDataMatrix( x1, x2, X );
+      printMatrix( X, NUM_PATTERNS, (ORDER + 1) );
+      /*
       //--------------------------------------------------------------------------------
       // design matrix is just X with a column of ones at the first position
       computeDesignMatrix( X, designMatrix );
@@ -226,6 +228,7 @@ int main(int argc, char *argv[])
       cout << "\nOptimal Weights" << endl;
       printVector( weights, ORDER );
       //--------------------------------------------------------------------------------
+      */
       printf ("\n Deallocating memory \n\n");
       mkl_free( x1 );
       mkl_free( x2 );
