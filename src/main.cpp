@@ -172,14 +172,14 @@ int main(int argc, char *argv[])
       //2. Compute outputs
       // put all data into X matrix!
       computeDataMatrix( x1, x2, X );
-      cout << "\nData matrix" << endl;
-      printMatrix( X, NUM_PATTERNS, 2 );
+      //cout << "\nData matrix" << endl;
+      //printMatrix( X, NUM_PATTERNS, 2 );
 
       //--------------------------------------------------------------------------------
       // design matrix is just X with a column of ones at the first position
       computeDesignMatrix( X, designMatrix );
-      cout << "\nDesign matrix" << endl;
-      printMatrix( designMatrix, 10, 3);
+      cout << "\nComputing Design matrix with identity basis functions..." << endl;
+      //printMatrix( designMatrix, NUM_PATTERNS, ORDER);
       /*
       //--------------------------------------------------------------------------------
       // y = sigma( Phi'*w)
