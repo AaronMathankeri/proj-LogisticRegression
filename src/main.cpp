@@ -172,13 +172,15 @@ int main(int argc, char *argv[])
       //2. Compute outputs
       // put all data into X matrix!
       computeDataMatrix( x1, x2, X );
-      printMatrix( X, NUM_PATTERNS, (ORDER + 1) );
-      /*
+      cout << "\nData matrix" << endl;
+      printMatrix( X, NUM_PATTERNS, 2 );
+
       //--------------------------------------------------------------------------------
       // design matrix is just X with a column of ones at the first position
       computeDesignMatrix( X, designMatrix );
       cout << "\nDesign matrix" << endl;
       printMatrix( designMatrix, 10, 3);
+      /*
       //--------------------------------------------------------------------------------
       // y = sigma( Phi'*w)
       computeMyOutputs( weights, designMatrix, y );
