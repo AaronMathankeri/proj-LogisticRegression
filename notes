@@ -14,4 +14,8 @@ Wed Aug 23 23:05:10 CDT 2017
 there is an error with the logistic sigmoid. the values are clamping to
 1 and 0 too quickly. When calculating the "R" matrix:
 y*(1-y) the values are just zero then. Need to fix this issue for
-Newton's optimization method. 
+Newton's optimization method.
+
+==========
+Tue Aug 29 08:46:17 CDT 2017
+Create unit tests for  w*x and sigmoid output.
