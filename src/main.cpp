@@ -89,7 +89,7 @@ void computeMyOutputs( const double *weights, const double *designMatrix, double
 
       //now apply to sigmoid to each element
       for (int i = 0; i < NUM_PATTERNS; ++i) {
-	    logisticSigmoid( y[i] );
+	    //logisticSigmoid( y[i] );
       }
 }
 
@@ -107,6 +107,15 @@ void updateWeights( double *weights, double *deltaWeights ){
       vdSub( ORDER, weights, deltaWeights, weights);
 }
 
+void computeYvalues( double *weights, double *designMatrix, double *y1 ){
+
+      for (int i = 0; i < NUM_PATTERNS; ++i) {
+	    for (int j = 0; j < ORDER; ++j) {
+		  y1[i] = weights[j] * designMatrix[i*ORDER + j];
+	    }
+      }
+
+}
 int main(int argc, char *argv[])
 {
       cout << " Aaron's Back." << endl;
@@ -180,12 +189,23 @@ int main(int argc, char *argv[])
       computeDesignMatrix( X, designMatrix );
       cout << "\nComputing Design matrix with identity basis functions..." << endl;
       //printMatrix( designMatrix, NUM_PATTERNS, ORDER);
-      /*
+
       //--------------------------------------------------------------------------------
       // y = sigma( Phi'*w)
       computeMyOutputs( weights, designMatrix, y );
-      cout << "\nFirst 10 Outputs" <<endl;
-      printVector( y, 5 );
+
+      double *y1 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );      
+      memset( y1, 0.0,  NUM_PATTERNS * sizeof(double));
+      computeYvalues( weights, designMatrix, y1 );
+      
+      cout << "\nFirst 10 Outputs" << endl;
+      printVector( y, 10 );
+
+      cout << "\nFirst 10 other Outputs" << endl;
+      printVector( y1, 10 );
+
+
+      /*
       //--------------------------------------------------------------------------------
       // Compute R - matrix
       for (int i = 0; i < NUM_PATTERNS; ++i) {
