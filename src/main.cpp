@@ -16,17 +16,24 @@
 
 using namespace std;
 
-void computeGradient( double *y, double *t, double *designMatrix, double *gradE ){
+void computeGradient( const double *y, const double *t, const double *designMatrix, double *gradE ){
       //gradE = phi' * ( y - t )
       //1. y <- y -t
-      vdSub( NUM_PATTERNS, y, t, y);
+      double *diff  = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
+      vdSub( NUM_PATTERNS, y, t, diff);
+
+      cout << "Difference from true in gradient calc..." << endl;
+      printVector( y, 10 );
+
       //2. phi' * y
       double alpha, beta;
       alpha = 1.0;
       beta = 0.0;
       const int incx = 1;
       cblas_dgemv(CblasRowMajor, CblasTrans, NUM_PATTERNS, ORDER, alpha, designMatrix,
-		  ORDER, y, incx, beta, gradE, incx);
+		  ORDER, diff, incx, beta, gradE, incx);
+
+      mkl_free( diff );
 }
 
 void computeHessian( double *designMatrix, double *R, double *Hessian ){
@@ -211,12 +218,13 @@ int main(int argc, char *argv[])
       printVector( y1, 10 );
       */
 
-
+      cout << "\n\nInitial error is " << computeLeastSquaresError( t, y ) << endl;
       //--------------------------------------------------------------------------------
       // Compute R - matrix
       for (int i = 0; i < NUM_PATTERNS; ++i) {
 	    R[i*NUM_PATTERNS + i] = y[i] * (1.0 - y[i]);
       }
+
       /*
       cout << "R matrix" << endl;
       for (int i=0; i < 10; i++) {
@@ -226,7 +234,7 @@ int main(int argc, char *argv[])
 	    printf ("\n");
       }
       */
-      /*
+
       //--------------------------------------------------------------------------------
       computeGradient( y , t, designMatrix, gradE );
       cout << "\nGradient :" <<endl;
@@ -244,8 +252,8 @@ int main(int argc, char *argv[])
       cout << "\nChange in weights is :" << endl;
       printVector( deltaWeights, ORDER );
       //--------------------------------------------------------------------------------
-      cout << "\n\nInitial error is " << computeLeastSquaresError( t, y ) << endl;
 
+      /*
       updateWeights( weights, deltaWeights );
       cout << "\nNew Weights" << endl;
       printVector( weights, ORDER );
@@ -263,6 +271,7 @@ int main(int argc, char *argv[])
       //4. compute update
       //5. apply update
       //--------------------------------------------------------------------------------
+      /*
       cout << "\nOptimal Weights" << endl;
       printVector( weights, ORDER );
       //--------------------------------------------------------------------------------
