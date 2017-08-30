@@ -202,20 +202,31 @@ int main(int argc, char *argv[])
       for (int i = 0; i < NUM_PATTERNS; ++i) {
 	    logisticSigmoid( y[i] );
       }
-      /*  
+     
       cout << "\nFirst 10 Outputs" << endl;
       printVector( y, 10 );
 
+      /*  
       cout << "\nFirst 10 other Outputs" << endl;
       printVector( y1, 10 );
       */
 
-      /*
+
       //--------------------------------------------------------------------------------
       // Compute R - matrix
       for (int i = 0; i < NUM_PATTERNS; ++i) {
 	    R[i*NUM_PATTERNS + i] = y[i] * (1.0 - y[i]);
       }
+      /*
+      cout << "R matrix" << endl;
+      for (int i=0; i < 10; i++) {
+	    for (int j=0; j < 10; j++) {
+		  printf ("%12.5f", R[i*NUM_PATTERNS +j]);
+	    }
+	    printf ("\n");
+      }
+      */
+      /*
       //--------------------------------------------------------------------------------
       computeGradient( y , t, designMatrix, gradE );
       cout << "\nGradient :" <<endl;
