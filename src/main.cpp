@@ -18,12 +18,13 @@ using namespace std;
 
 void computeGradient( const double *y, const double *t, const double *designMatrix, double *gradE ){
       //gradE = phi' * ( y - t )
-      //1. y <- y -t
+      //1. diff <- y -t
       double *diff  = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
+      memset( diff, 0.0,  NUM_PATTERNS* sizeof(double));
       vdSub( NUM_PATTERNS, y, t, diff);
 
-      cout << "Difference from true in gradient calc..." << endl;
-      printVector( y, 10 );
+      //cout << "Difference from true in gradient calc..." << endl;
+      //printVector( diff, 100 );
 
       //2. phi' * y
       double alpha, beta;
@@ -36,7 +37,7 @@ void computeGradient( const double *y, const double *t, const double *designMatr
       mkl_free( diff );
 }
 
-void computeHessian( double *designMatrix, double *R, double *Hessian ){
+void computeHessian( const double *designMatrix, const double *R, double *Hessian ){
       //H = phi' * R * phi
       memset( Hessian, 0.0,  ORDER * ORDER* sizeof(double));
       double alpha, beta;
@@ -49,6 +50,18 @@ void computeHessian( double *designMatrix, double *R, double *Hessian ){
       cblas_dgemm(CblasRowMajor, CblasTrans, CblasNoTrans, 
 		  ORDER, NUM_PATTERNS, NUM_PATTERNS, alpha, designMatrix,
 		  NUM_PATTERNS, R, NUM_PATTERNS, beta, A, NUM_PATTERNS);
+
+
+      // error is HERE!!!!
+      cout << "A matrix" << endl;
+      for (int i=0; i < ORDER; i++) {
+	    for (int j=0; j < 100; j++) {
+		  printf ("%12.5f", A[i*NUM_PATTERNS +j]);
+	    }
+	    printf ("\n");
+      }
+
+
       // A * phi = Hessian
       cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 
 		  ORDER, ORDER, NUM_PATTERNS, alpha, A,
@@ -75,6 +88,12 @@ void computeInverseHessian( double *Hessian ){
 void logisticSigmoid( double &a ){
       // sigma(a) = (1 + exp(-a) )^-1
       a = 1.0/( 1.0 + exp(-a) );
+}
+
+double mySigmoid( double a ){
+      // sigma(a) = (1 + exp(-a) )^-1
+      a = 1.0/( 1.0 + exp(-a) );
+      return a;
 }
 
 void computeDataMatrix( const double *x1, const double *x2, double *X ){
@@ -112,9 +131,14 @@ void computeUpdates( const double *gradE, const double *invHessian, double *delt
 
 void updateWeights( double *weights, double *deltaWeights ){
       vdSub( ORDER, weights, deltaWeights, weights);
+      /*
+      weights[0] = weights[0] - -3.7629;
+      weights[1] = weights[1] - 8.2755;
+      weights[2] = weights[2] - 8.4251;
+      */
 }
 
-void computeYvalues( double *weights, double *designMatrix, double *y1 ){
+void computeYvalues( const double *weights, const double *designMatrix, double *y1 ){
 
       for (int i = 0; i < NUM_PATTERNS; ++i) {
 	    for (int j = 0; j < ORDER; ++j) {
@@ -210,9 +234,8 @@ int main(int argc, char *argv[])
 	    logisticSigmoid( y[i] );
       }
      
-      cout << "\nFirst 10 Outputs" << endl;
-      printVector( y, 10 );
-
+      //cout << "\nFirst 10 Outputs" << endl;
+      //printVector( y, 100 );
       /*  
       cout << "\nFirst 10 other Outputs" << endl;
       printVector( y1, 10 );
@@ -243,6 +266,7 @@ int main(int argc, char *argv[])
       computeHessian( designMatrix, R, Hessian );
       cout << "\nHessian :" <<endl;
       printMatrix( Hessian, ORDER, ORDER );
+      /*
       //--------------------------------------------------------------------------------
       computeInverseHessian( Hessian );
       cout << "\nInverse Hessian :" <<endl;
@@ -252,17 +276,16 @@ int main(int argc, char *argv[])
       cout << "\nChange in weights is :" << endl;
       printVector( deltaWeights, ORDER );
       //--------------------------------------------------------------------------------
-
-      /*
       updateWeights( weights, deltaWeights );
       cout << "\nNew Weights" << endl;
       printVector( weights, ORDER );
 
+      cout << "\n\nNew error is " << computeLeastSquaresError( t, y ) << endl;
       computeMyOutputs( weights, designMatrix, y );
       //cout << "\nFirst 10 Outputs" <<endl;
       //printVector( y, 100 );
-
       cout << "\n\nNew error is " << computeLeastSquaresError( t, y ) << endl;
+
       //--------------------------------------------------------------------------------
       // Newton's method!
       //1. compute gradient

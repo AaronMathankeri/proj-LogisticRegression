@@ -76,6 +76,7 @@ void solveNormalEquations( const double *inversePhi, const double *t, double *w 
       		   alpha, inversePhi, NUM_PATTERNS, t, 1, beta, w, 1);
 }
 void computeOutputs( const double *x, const double *w , double *y ){
+      memset( y, 0.0,  NUM_PATTERNS * sizeof(double));
       for (int i = 0; i < NUM_PATTERNS; ++i) {
 	    double temp = 0.0;
 	    for (int j = 0; j < ORDER; ++j) {
