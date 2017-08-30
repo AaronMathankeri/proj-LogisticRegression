@@ -49,19 +49,17 @@ void computeHessian( const double *designMatrix, const double *R, double *Hessia
       //calculate product = Phi' * R = A
       cblas_dgemm(CblasRowMajor, CblasTrans, CblasNoTrans, 
 		  ORDER, NUM_PATTERNS, NUM_PATTERNS, alpha, designMatrix,
-		  NUM_PATTERNS, R, NUM_PATTERNS, beta, A, NUM_PATTERNS);
-
-
-      // error is HERE!!!!
+		  ORDER, R, NUM_PATTERNS, beta, A, NUM_PATTERNS);
+      /*
+      // error is HERE!!!! [fixed]
       cout << "A matrix" << endl;
       for (int i=0; i < ORDER; i++) {
-	    for (int j=0; j < 100; j++) {
-		  printf ("%12.5f", A[i*NUM_PATTERNS +j]);
+	    for (int j=0; j < 10; j++) {
+		  printf ("%12.8f", A[i*NUM_PATTERNS +j]);
 	    }
 	    printf ("\n");
       }
-
-
+      */
       // A * phi = Hessian
       cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 
 		  ORDER, ORDER, NUM_PATTERNS, alpha, A,
