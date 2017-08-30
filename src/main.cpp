@@ -23,9 +23,6 @@ void computeGradient( const double *y, const double *t, const double *designMatr
       memset( diff, 0.0,  NUM_PATTERNS* sizeof(double));
       vdSub( NUM_PATTERNS, y, t, diff);
 
-      //cout << "Difference from true in gradient calc..." << endl;
-      //printVector( diff, 100 );
-
       //2. phi' * y
       double alpha, beta;
       alpha = 1.0;
@@ -50,16 +47,6 @@ void computeHessian( const double *designMatrix, const double *R, double *Hessia
       cblas_dgemm(CblasRowMajor, CblasTrans, CblasNoTrans, 
 		  ORDER, NUM_PATTERNS, NUM_PATTERNS, alpha, designMatrix,
 		  ORDER, R, NUM_PATTERNS, beta, A, NUM_PATTERNS);
-      /*
-      // error is HERE!!!! [fixed]
-      cout << "A matrix" << endl;
-      for (int i=0; i < ORDER; i++) {
-	    for (int j=0; j < 10; j++) {
-		  printf ("%12.8f", A[i*NUM_PATTERNS +j]);
-	    }
-	    printf ("\n");
-      }
-      */
       // A * phi = Hessian
       cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, 
 		  ORDER, ORDER, NUM_PATTERNS, alpha, A,
@@ -113,7 +100,7 @@ void computeMyOutputs( const double *weights, const double *designMatrix, double
 
       //now apply to sigmoid to each element
       for (int i = 0; i < NUM_PATTERNS; ++i) {
-	    //logisticSigmoid( y[i] );
+	    logisticSigmoid( y[i] );
       }
 }
 
@@ -129,22 +116,8 @@ void computeUpdates( const double *gradE, const double *invHessian, double *delt
 
 void updateWeights( double *weights, double *deltaWeights ){
       vdSub( ORDER, weights, deltaWeights, weights);
-      /*
-      weights[0] = weights[0] - -3.7629;
-      weights[1] = weights[1] - 8.2755;
-      weights[2] = weights[2] - 8.4251;
-      */
 }
 
-void computeYvalues( const double *weights, const double *designMatrix, double *y1 ){
-
-      for (int i = 0; i < NUM_PATTERNS; ++i) {
-	    for (int j = 0; j < ORDER; ++j) {
-		  y1[i] += weights[j] * designMatrix[i*ORDER + j];
-	    }
-      }
-
-}
 int main(int argc, char *argv[])
 {
       cout << " Aaron's Back." << endl;
@@ -152,7 +125,7 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------------------
       // declare variables for calculations
       double *x1, *x2, *t, *X; //data
-      double *weights, *y, *designMatrix, *R, *z; //logistic regression parameters
+      double *weights, *y, *designMatrix, *R; //logistic regression parameters
 
       double *gradE, *Hessian, *deltaWeights;
       
@@ -165,7 +138,6 @@ int main(int argc, char *argv[])
       y = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       designMatrix = (double *)mkl_malloc( NUM_PATTERNS*ORDER*sizeof( double ), 64 );
       R = (double *)mkl_malloc( NUM_PATTERNS*NUM_PATTERNS*sizeof( double ), 64 );
-      z = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );
       
       gradE = (double *)mkl_malloc( ORDER*sizeof( double ), 64 );
       Hessian = (double *)mkl_malloc( ORDER*ORDER*sizeof( double ), 64 );
@@ -180,7 +152,6 @@ int main(int argc, char *argv[])
       memset( y, 0.0,  NUM_PATTERNS * sizeof(double));
       memset( designMatrix, 0.0,  NUM_PATTERNS * ORDER* sizeof(double));
       memset( R, 0.0,  NUM_PATTERNS *NUM_PATTERNS* sizeof(double));
-      memset( z, 0.0,  NUM_PATTERNS * sizeof(double));
 
       memset( gradE, 0.0, ORDER * sizeof(double));
       memset( Hessian, 0.0,  ORDER * ORDER* sizeof(double));
@@ -212,33 +183,16 @@ int main(int argc, char *argv[])
       computeDataMatrix( x1, x2, X );
       //cout << "\nData matrix" << endl;
       //printMatrix( X, NUM_PATTERNS, 2 );
-
       //--------------------------------------------------------------------------------
       // design matrix is just X with a column of ones at the first position
       computeDesignMatrix( X, designMatrix );
       cout << "\nComputing Design matrix with identity basis functions..." << endl;
       //printMatrix( designMatrix, NUM_PATTERNS, ORDER);
-
       //--------------------------------------------------------------------------------
       // y = sigma( Phi'*w)
       computeMyOutputs( weights, designMatrix, y );
-
-      double *y1 = (double *)mkl_malloc( NUM_PATTERNS*sizeof( double ), 64 );      
-      memset( y1, 0.0,  NUM_PATTERNS * sizeof(double));
-      computeYvalues( weights, designMatrix, y1 );
-
-      //now apply to sigmoid to each element
-      for (int i = 0; i < NUM_PATTERNS; ++i) {
-	    logisticSigmoid( y[i] );
-      }
-     
       //cout << "\nFirst 10 Outputs" << endl;
       //printVector( y, 100 );
-      /*  
-      cout << "\nFirst 10 other Outputs" << endl;
-      printVector( y1, 10 );
-      */
-
       cout << "\n\nInitial error is " << computeLeastSquaresError( t, y ) << endl;
       //--------------------------------------------------------------------------------
       // Compute R - matrix
@@ -279,14 +233,10 @@ int main(int argc, char *argv[])
 
       cout << "\n\nNew error is " << computeLeastSquaresError( t, y ) << endl;
       computeMyOutputs( weights, designMatrix, y );
-      //now apply to sigmoid to each element
-      for (int i = 0; i < NUM_PATTERNS; ++i) {
-	    logisticSigmoid( y[i] );
-      }
       //cout << "\nFirst 10 Outputs" <<endl;
       //printVector( y, 100 );
       cout << "\n\nNew error is " << computeLeastSquaresError( t, y ) << endl;
-      /*
+
       //--------------------------------------------------------------------------------
       // Newton's method!
       //1. compute gradient
@@ -295,26 +245,48 @@ int main(int argc, char *argv[])
       //4. compute update
       //5. apply update
       //--------------------------------------------------------------------------------
+      cout << "\nBEGIN OPTIMIZATION VIA NEWTON'S METHOD" << endl;
+      double thresh = 1e-3;
+      double oldError = computeLeastSquaresError( t , y);
+      double newError = oldError + 1e2;
+      //cout << fabs(newError - oldError) << endl;
 
-
-
-
-
-      /*
+      while (fabs(newError - oldError) > thresh ) {
+	    computeMyOutputs( weights, designMatrix, y );
+	    oldError = computeLeastSquaresError( t , y );
+	    //--------------------------------------------------------------------------------
+	    // Compute R - matrix
+	    for (int i = 0; i < NUM_PATTERNS; ++i) {
+		  R[i*NUM_PATTERNS + i] = y[i] * (1.0 - y[i]);
+	    }
+	    //--------------------------------------------------------------------------------
+	    computeGradient( y , t, designMatrix, gradE );
+	    //--------------------------------------------------------------------------------
+	    computeHessian( designMatrix, R, Hessian );
+	    //--------------------------------------------------------------------------------
+	    computeInverseHessian( Hessian );
+	    //--------------------------------------------------------------------------------
+	    computeUpdates( gradE, Hessian, deltaWeights );
+	    //--------------------------------------------------------------------------------
+	    updateWeights( weights, deltaWeights );
+	    //--------------------------------------------------------------------------------
+	    computeMyOutputs( weights, designMatrix, y );
+	    newError = computeLeastSquaresError( t , y );
+	    cout << "\n\nNew error is " << computeLeastSquaresError( t, y ) << endl;
+      }
+      
       cout << "\nOptimal Weights" << endl;
       printVector( weights, ORDER );
       //--------------------------------------------------------------------------------
-      */
+
       printf ("\n Deallocating memory \n\n");
       mkl_free( x1 );
       mkl_free( x2 );
       mkl_free( t );
       mkl_free( weights );
       mkl_free( y );
-      mkl_free( y1 );
       mkl_free( designMatrix );
       mkl_free( R );
-      mkl_free( z );
       mkl_free( X );
       mkl_free( gradE );
       mkl_free( Hessian );
