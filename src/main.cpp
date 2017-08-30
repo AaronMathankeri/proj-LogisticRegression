@@ -264,7 +264,6 @@ int main(int argc, char *argv[])
       computeHessian( designMatrix, R, Hessian );
       cout << "\nHessian :" <<endl;
       printMatrix( Hessian, ORDER, ORDER );
-      /*
       //--------------------------------------------------------------------------------
       computeInverseHessian( Hessian );
       cout << "\nInverse Hessian :" <<endl;
@@ -280,10 +279,14 @@ int main(int argc, char *argv[])
 
       cout << "\n\nNew error is " << computeLeastSquaresError( t, y ) << endl;
       computeMyOutputs( weights, designMatrix, y );
+      //now apply to sigmoid to each element
+      for (int i = 0; i < NUM_PATTERNS; ++i) {
+	    logisticSigmoid( y[i] );
+      }
       //cout << "\nFirst 10 Outputs" <<endl;
       //printVector( y, 100 );
       cout << "\n\nNew error is " << computeLeastSquaresError( t, y ) << endl;
-
+      /*
       //--------------------------------------------------------------------------------
       // Newton's method!
       //1. compute gradient
@@ -292,6 +295,11 @@ int main(int argc, char *argv[])
       //4. compute update
       //5. apply update
       //--------------------------------------------------------------------------------
+
+
+
+
+
       /*
       cout << "\nOptimal Weights" << endl;
       printVector( weights, ORDER );
