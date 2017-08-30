@@ -202,12 +202,13 @@ int main(int argc, char *argv[])
       for (int i = 0; i < NUM_PATTERNS; ++i) {
 	    logisticSigmoid( y[i] );
       }
-      
+      /*  
       cout << "\nFirst 10 Outputs" << endl;
       printVector( y, 10 );
 
       cout << "\nFirst 10 other Outputs" << endl;
       printVector( y1, 10 );
+      */
 
       /*
       //--------------------------------------------------------------------------------
@@ -261,6 +262,7 @@ int main(int argc, char *argv[])
       mkl_free( t );
       mkl_free( weights );
       mkl_free( y );
+      mkl_free( y1 );
       mkl_free( designMatrix );
       mkl_free( R );
       mkl_free( z );
