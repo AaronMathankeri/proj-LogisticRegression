@@ -9,13 +9,11 @@ CONTENTS OF THIS FILE
    
  * Introduction
  * Requirements
- * Recommended modules
  * Installation
  * Configuration
  * Example
  * Troubleshooting
  * FAQ
- * Maintainers
  ---------------------
  INTRODUCTION
 Logistic regression is used for binary classification.
@@ -29,4 +27,40 @@ p(c = 1 | x) = sigma(y).
 
 Classification is only possible if data is NOT linearly
 separable.
+ ---------------------
+  REQUIREMENTS
+ * Intel MKL installed locally.
+ * Intel compiler supporting C++11
+ * R >= 3.4.0
+ ---------------------
+ INSTALLATION
+ Project can be cloned and run for a terminal.
+ ---------------------
+ CONFIGURATION
+ Path to MKL must be set in 'Makefile'
+ ---------------------
+ EXAMPLE
+ $ make
+ $ [output]
+   Optimal Weights
+   	     4.48205
+	   -18.41219
+	    11.59814
+ ---------------------
+ TROUBLESHOOTING
+ Most errors will be setting the proper path to MKL
+ Dynamically linking libraries will be an issure on OSX.
+ Make sure to properly dynamically link in 'Makefile'
+ ---------------------
+ FAQ
+ (1) What is the benefit of using this framework?
+     For more information: //software.intel.com/en-us/mkl
+ (2) What are the applications of LogisticRegression??
+     For more information: PRML by Christopher Bishop
+ (3) Why not use more mainstream frameworks?
+     It's faster. Much faster. This solution can be deployed
+     on large compute clusters enabling rapid large-scale inference.
+     Because of how light weight it is, it can be deployed on
+     gateways and IoT devices where memory and compute architecture may
+     be constrained.
  ---------------------
